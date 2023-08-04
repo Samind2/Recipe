@@ -7,9 +7,21 @@ const screen = {
 }
 //console.log(screen);
 
-const showFullRecipe = async(id) =>{
+const showFullRecipe = async (id) => {
     screen.main.classList.add("hidden");
     screen.recipe.classList.remove("hidden")
+
+    screen.recipe.querySelector(".back-btn").addEventListener("click", ()=>{
+         screen.recipe.classList.add("hidden")
+         screen.main.classList.remove("hidden");
+         screen.recipe.querySelector(".thumbnail img").innerHTML = "";
+         screen.recipe.querySelector(".detail h2").innerHTML = "";
+         screen.recipe.querySelector(".details ul").innerHTML = "";
+         screen.recipe.querySelector(".details ol").innerHTML = "";
+
+       
+
+    })
     try {
         const res = await fetch(API + "lookup.php?i=" + id);
         const data = await res.json();
@@ -17,16 +29,27 @@ const showFullRecipe = async(id) =>{
         //
         screen.recipe.querySelector(".thumbnail img").src = recipe.strMealthumb;
         screen.recipe.querySelector(".details h2").innerHTML = recipe.strMeal;
-        for(let i=0 ;i < 20 ; i++){
-            if(recipe["strIngridient"+i].length == 0){
-            break;}
-        }
-        const li = document.createElement("li");
-        li.innerText = `${recipe["strIngridient" + i]} = ${
+        for (let i = 0; i < 20; i++) {
+            if (recipe["strIngridient" + i].length == 0) {
+                break;
+            }
+            const li = document.createElement("li");
+            li.innerText = `${recipe["strIngridient" + i]} = ${
             recipe["strMesure" + i]
         }
         `;
-        screen.recipe.querySelector(".details ul").appendChild;
+        screen.recipe.querySelector(".detail ul").appendChild(li);
+        }
+        let instruction = recipe.strInstructions
+        .split("\r\n")
+        .filter((str) => str);
+        for(let i=0;i<instruction.length;i++){
+            let li = document.createElement("li");
+            li.innerText = instruction[li];
+            screen.recipe.querySelector(".detail ol").appendChild(li);
+        }
+        
+
 
     } catch (error) {
         console.error("showFullrecipe:", error);
@@ -38,7 +61,7 @@ const getRecipeOfCategory = async (category) => {
         const res = await fetch(API + "filter.php?c=" + category);
         const data = await res.json();
         const recipe = data.meals;
-        for(let i=0 ; i< recipe.length ; i++){
+        for (let i = 0; i < recipe.length; i++) {
             const div = document.createElement("div");
             div.classList.add("item");
             div.innerHTML = `
